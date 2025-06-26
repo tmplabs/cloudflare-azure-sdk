@@ -1,0 +1,25 @@
+{
+  "name": "azure-workers-sdk",
+  "version": "1.0.0",
+  "description": "Cloudflare Workers for Azure services (Email and Notifications)",
+  "main": "src/email.ts",
+  "scripts": {
+    "dev:email": "wrangler dev",
+    "dev:notifications": "wrangler dev --env notifications",
+    "deploy:email": "wrangler deploy",
+    "deploy:notifications": "wrangler deploy --env notifications",
+    "deploy:email:staging": "wrangler deploy --env email-staging",
+    "deploy:notifications:staging": "wrangler deploy --env notifications-staging",
+    "deploy:email:production": "wrangler deploy --env email-production",
+    "deploy:notifications:production": "wrangler deploy --env notifications-production"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "typescript": "^5.6.3",
+    "wrangler": "^3.95.0"
+  },
+  "dependencies": {
+    "@azure/communication-email": "^1.1.0",
+    "@azure/notification-hubs": "^1.2.0"
+  }
+}

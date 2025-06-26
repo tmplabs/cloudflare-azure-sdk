@@ -1,0 +1,31 @@
+name = "azure-email-worker"
+main = "src/email.ts"
+compatibility_date = "2024-12-01"
+
+[vars]
+# Email worker environment variables
+# AZURE_COMMUNICATION_CONNECTION_STRING = "your-connection-string"
+# FROM_EMAIL = "noreply@yourdomain.com"
+
+[env.email-production]
+name = "azure-email-worker-prod"
+main = "src/email.ts"
+
+[env.email-staging]
+name = "azure-email-worker-staging"
+main = "src/email.ts"
+
+# Notifications worker environments
+[env.notifications]
+name = "azure-notifications-worker"
+main = "src/notifications.ts"
+# AZURE_NOTIFICATION_HUB_CONNECTION_STRING = "your-connection-string"
+# AZURE_NOTIFICATION_HUB_NAME = "your-hub-name"
+
+[env.notifications-production]
+name = "azure-notifications-worker-prod"
+main = "src/notifications.ts"
+
+[env.notifications-staging]
+name = "azure-notifications-worker-staging"
+main = "src/notifications.ts"
