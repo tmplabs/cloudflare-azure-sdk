@@ -1,4 +1,5 @@
 import { EmailClient } from '@azure/communication-email';
+import { validateApiKey } from './auth';
 
 interface EmailRequest {
   to: string;
@@ -8,12 +9,19 @@ interface EmailRequest {
 }
 
 interface Env {
+  API_KEY: string;
   AZURE_COMMUNICATION_CONNECTION_STRING: string;
   FROM_EMAIL: string;
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    // Validate API key
+    const authError = validateApiKey(request, env);
+    if (authError) {
+      return authError;
+    }
+
     // Only allow POST requests
     if (request.method !== 'POST') {
       return new Response('Method not allowed', { status: 405 });

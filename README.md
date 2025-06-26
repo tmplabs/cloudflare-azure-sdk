@@ -1,14 +1,14 @@
 # Azure Workers SDK
 
-Cloudflare Workers for Azure services including Email and Push Notifications.
+Cloudflare Worker providing secure REST API for Azure services including Email and Push Notifications.
 
-## Workers
+## Features
 
-### 1. Email Worker
-Sends emails using Azure Communication Service.
-
-### 2. Notifications Worker  
-Sends push notifications using Azure Notification Hubs.
+- **Email Service** - Send emails via Azure Communication Service
+- **Push Notifications** - Send notifications via Azure Notification Hubs
+- **API Key Authentication** - Secure endpoints with key-based auth
+- **Multi-platform Support** - iOS, Android, Windows notifications
+- **Template Notifications** - Cross-platform notification templates
 
 ## Setup
 
@@ -17,33 +17,48 @@ Sends push notifications using Azure Notification Hubs.
 npm install
 ```
 
-2. Configure environment variables:
+2. Configure environment variables and secrets:
 
-**For Email Worker:**
 ```bash
+# Set API key for authentication
+wrangler secret put API_KEY
+
+# Azure Communication Service (for email)
 wrangler secret put AZURE_COMMUNICATION_CONNECTION_STRING
 wrangler secret put FROM_EMAIL
+
+# Azure Notification Hubs (for push notifications)  
+wrangler secret put AZURE_NOTIFICATION_HUB_CONNECTION_STRING
+wrangler secret put AZURE_NOTIFICATION_HUB_NAME
 ```
 
-**For Notifications Worker:**
+3. Deploy the worker:
 ```bash
-wrangler secret put AZURE_NOTIFICATION_HUB_CONNECTION_STRING --env notifications
-wrangler secret put AZURE_NOTIFICATION_HUB_NAME --env notifications
+npm run deploy          # Deploy to development
+npm run deploy:staging  # Deploy to staging
+npm run deploy:production # Deploy to production
 ```
 
-3. Deploy workers:
+## Authentication
+
+All endpoints (except `/health`) require API key authentication. Provide your API key using one of these methods:
+
+- **Authorization header**: `Authorization: Bearer YOUR_API_KEY`
+- **Custom header**: `x-api-key: YOUR_API_KEY`  
+- **Query parameter**: `?api_key=YOUR_API_KEY`
+
+## API Endpoints
+
+### Health Check
 ```bash
-npm run deploy:email        # Deploy email worker
-npm run deploy:notifications # Deploy notifications worker
+GET https://your-worker.workers.dev/health
+# No authentication required
 ```
 
-## Usage
-
-### Email Worker
-
-Send a POST request:
+### Send Email
 ```bash
-curl -X POST https://your-email-worker.your-subdomain.workers.dev \
+curl -X POST https://your-worker.workers.dev/email \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "to": "recipient@example.com",
@@ -53,13 +68,12 @@ curl -X POST https://your-email-worker.your-subdomain.workers.dev \
   }'
 ```
 
-### Notifications Worker
-
-Send push notifications:
+### Send Push Notifications
 
 **iOS (APNS):**
 ```bash
-curl -X POST https://your-notifications-worker.your-subdomain.workers.dev \
+curl -X POST https://your-worker.workers.dev/notifications \
+  -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "apns",
@@ -71,11 +85,12 @@ curl -X POST https://your-notifications-worker.your-subdomain.workers.dev \
 
 **Android (FCM):**
 ```bash
-curl -X POST https://your-notifications-worker.your-subdomain.workers.dev \
+curl -X POST https://your-worker.workers.dev/notifications \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "fcm",
-    "title": "Hello",
+    "title": "Hello", 
     "message": "Push notification from Azure!",
     "deviceHandle": "device-token-here"
   }'
@@ -83,7 +98,7 @@ curl -X POST https://your-notifications-worker.your-subdomain.workers.dev \
 
 **Windows (WNS):**
 ```bash
-curl -X POST https://your-notifications-worker.your-subdomain.workers.dev \
+curl -X POST https://your-worker.workers.dev/notifications?api_key=YOUR_API_KEY \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "wns",
@@ -95,11 +110,12 @@ curl -X POST https://your-notifications-worker.your-subdomain.workers.dev \
 
 **Template Notifications:**
 ```bash
-curl -X POST https://your-notifications-worker.your-subdomain.workers.dev \
+curl -X POST https://your-worker.workers.dev/notifications \
+  -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "platform": "fcm",
-    "templateName": "welcome",
+    "templateName": "welcome", 
     "templateProperties": {
       "username": "John",
       "action": "login"
@@ -110,21 +126,30 @@ curl -X POST https://your-notifications-worker.your-subdomain.workers.dev \
 
 ## Environment Variables
 
-### Email Worker
+### Authentication
+- `API_KEY`: Secure API key for endpoint authentication
+
+### Email Service  
 - `AZURE_COMMUNICATION_CONNECTION_STRING`: Azure Communication Service connection string
 - `FROM_EMAIL`: Sender email address (must be verified in Azure)
 
-### Notifications Worker
-- `AZURE_NOTIFICATION_HUB_CONNECTION_STRING`: Azure Notification Hub connection string
+### Push Notifications
+- `AZURE_NOTIFICATION_HUB_CONNECTION_STRING`: Azure Notification Hub connection string  
 - `AZURE_NOTIFICATION_HUB_NAME`: Name of your notification hub
 
 ## Development
 
 Run locally:
 ```bash
-npm run dev:email         # Run email worker locally
-npm run dev:notifications # Run notifications worker locally
+npm run dev  # Run worker locally with hot reload
 ```
+
+## Security Features
+
+- **API Key Authentication** - All endpoints protected except health check
+- **Timing-Safe Comparison** - Prevents timing attacks on API key validation
+- **Multiple Auth Methods** - Support for header and query parameter auth
+- **Input Validation** - Request validation and sanitization
 
 ## Supported Platforms
 

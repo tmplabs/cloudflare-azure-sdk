@@ -1,4 +1,5 @@
 import { NotificationHubsClient } from '@azure/notification-hubs';
+import { validateApiKey } from './auth';
 
 interface NotificationRequest {
   platform: 'apns' | 'fcm' | 'wns' | 'mpns' | 'adm' | 'baidu';
@@ -11,12 +12,19 @@ interface NotificationRequest {
 }
 
 interface Env {
+  API_KEY: string;
   AZURE_NOTIFICATION_HUB_CONNECTION_STRING: string;
   AZURE_NOTIFICATION_HUB_NAME: string;
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    // Validate API key
+    const authError = validateApiKey(request, env);
+    if (authError) {
+      return authError;
+    }
+
     // Only allow POST requests
     if (request.method !== 'POST') {
       return new Response('Method not allowed', { status: 405 });
