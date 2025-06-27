@@ -1,4 +1,4 @@
-import { NotificationHubsClient } from '@azure/notification-hubs';
+import { NotificationHubsClient, WindowsContentType } from '@azure/notification-hubs';
 import { validateApiKey } from './auth';
 
 interface NotificationRequest {
@@ -63,12 +63,13 @@ export default {
         const templateNotification = {
           body: JSON.stringify(notificationRequest.templateProperties),
           headers: {},
-          contentType: 'application/json;charset=utf-8'
+          contentType: "application/json;charset=utf-8" as const,
+          platform: "template" as const
         };
 
         if (notificationRequest.deviceHandle) {
-          // Send template notification to specific device
-          result = await client.sendDirectNotification(
+          // Send template notification to specific device using tag expression
+          result = await client.sendNotification(
             templateNotification,
             { deviceHandle: notificationRequest.deviceHandle }
           );
@@ -76,7 +77,7 @@ export default {
           // Send template notification with tags
           result = await client.sendNotification(
             templateNotification,
-            { tags: notificationRequest.tags }
+            { tagExpression: notificationRequest.tags?.join(' || ') }
           );
         }
       } else {
@@ -96,7 +97,8 @@ export default {
                 }
               }),
               headers: { 'apns-priority': '10' },
-              contentType: 'application/json;charset=utf-8'
+              contentType: "application/json;charset=utf-8" as const,
+              platform: "apple" as const
             };
             break;
 
@@ -112,7 +114,8 @@ export default {
                 }
               }),
               headers: {},
-              contentType: 'application/json;charset=utf-8'
+              contentType: "application/json;charset=utf-8" as const,
+              platform: "gcm" as const
             };
             break;
 
@@ -131,7 +134,8 @@ export default {
             notification = {
               body: toastXml,
               headers: { 'X-WNS-Type': 'wns/toast' },
-              contentType: 'text/xml'
+              contentType: "application/json;charset=utf-8" as const,
+              platform: "browser" as const
             };
             break;
 
@@ -143,8 +147,8 @@ export default {
         }
 
         if (notificationRequest.deviceHandle) {
-          // Send to specific device
-          result = await client.sendDirectNotification(
+          // Send to specific device using deviceHandle
+          result = await client.sendNotification(
             notification,
             { deviceHandle: notificationRequest.deviceHandle }
           );
@@ -152,7 +156,7 @@ export default {
           // Send to tags or all devices
           result = await client.sendNotification(
             notification,
-            { tags: notificationRequest.tags }
+            { tagExpression: notificationRequest.tags?.join(' || ') }
           );
         }
       }

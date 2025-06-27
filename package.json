@@ -1,21 +1,55 @@
 {
-  "name": "azure-workers-sdk",
+  "name": "cloudflare-azure-email",
   "version": "1.0.0",
-  "description": "Cloudflare Workers for Azure services (Email and Notifications)",
-  "main": "src/index.ts",
+  "description": "A Cloudflare Worker package for sending emails using Azure Communication Services",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc && wrangler publish --dry-run",
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "deploy:staging": "wrangler deploy --env staging",
-    "deploy:production": "wrangler deploy --env production"
+    "deploy": "wrangler publish",
+    "test": "vitest",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "keywords": [
+    "cloudflare",
+    "worker",
+    "azure",
+    "email",
+    "communication-services",
+    "serverless"
+  ],
+  "author": "TMP Labs LLC",
+  "license": "MIT",
+  "dependencies": {
+    "@azure/communication-email": "^1.0.0",
+    "@azure/identity": "^4.10.1",
+    "@azure/notification-hubs": "^2.0.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241127.0",
-    "typescript": "^5.6.3",
-    "wrangler": "^3.95.0"
+    "@cloudflare/workers-types": "^4.20240925.0",
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "wrangler": "^3.0.0"
   },
-  "dependencies": {
-    "@azure/communication-email": "^1.1.0",
-    "@azure/notification-hubs": "^1.2.0"
-  }
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/cloudflare-azure-email.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/cloudflare-azure-email/issues"
+  },
+  "homepage": "https://github.com/yourusername/cloudflare-azure-email#readme"
 }

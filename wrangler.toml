@@ -1,21 +1,42 @@
-name = "azure-workers-sdk"
+name = "cloudflare-azure-email"
 main = "src/index.ts"
-compatibility_date = "2024-12-01"
+compatibility_date = "2024-10-25"
+compatibility_flags = ["nodejs_compat"]
 
+# Worker configuration
+[build]
+command = "npm run build"
+
+# Environment variables (set these in Cloudflare dashboard or using wrangler secret)
 [vars]
-# Authentication - set via wrangler secret
-# API_KEY = "your-secure-api-key"
+LOG_LEVEL = "info"
+ALLOWED_ORIGINS = "*"
+MAX_EMAILS_PER_HOUR = "100"
 
-# Email worker environment variables
-# AZURE_COMMUNICATION_CONNECTION_STRING = "your-connection-string" 
-# FROM_EMAIL = "noreply@yourdomain.com"
+# Secrets (set using: wrangler secret put SECRET_NAME)
+# AZURE_COMMUNICATION_CONNECTION_STRING
+# AZURE_CLIENT_ID (if using service principal)
+# AZURE_CLIENT_SECRET (if using service principal)
+# AZURE_TENANT_ID (if using service principal)
+# AZURE_COMMUNICATION_ENDPOINT (if using service principal)
 
-# Notifications worker environment variables  
-# AZURE_NOTIFICATION_HUB_CONNECTION_STRING = "your-connection-string"
-# AZURE_NOTIFICATION_HUB_NAME = "your-hub-name"
+# Optional: KV namespace for rate limiting
+# [[kv_namespaces]]
+# binding = "EMAIL_RATE_LIMIT"
+# id = "your-kv-namespace-id"
+# preview_id = "your-preview-kv-namespace-id"
 
-[env.production]
-name = "azure-workers-sdk-prod"
+# Optional: Durable Objects for advanced rate limiting
+# [durable_objects]
+# bindings = [
+#   { name = "RATE_LIMITER", class_name = "RateLimiter" }
+# ]
 
-[env.staging]
-name = "azure-workers-sdk-staging"
+# Routes (uncomment if you want to bind to a custom domain)
+# routes = [
+#   "api.yourdomain.com/send-email"
+# ]
+
+# Optional: Cron triggers for cleanup tasks
+# [triggers]
+# crons = ["0 0 * * *"]  # Daily cleanup at midnight
